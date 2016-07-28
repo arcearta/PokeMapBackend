@@ -1,13 +1,14 @@
 package service.pokemon
 
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass
+import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
 import com.pokegoapi.api.map.pokemon.{CatchResult, CatchablePokemon, EncounterResult}
 import com.pokegoapi.util.Log
 import dto._
 import okhttp3.OkHttpClient
+import com.pokegoapi.auth._;
 
 import scala.collection.JavaConversions._
 
@@ -18,18 +19,17 @@ class PokemonServices {
 
   def getNearPokemon(findPokemon: FindPokemon): List[PokemonPosition] = {
     val http: OkHttpClient = new OkHttpClient
-    var auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo = null
+    var auth: AuthInfo = null
 
     var listPokemons = List[PokemonPosition]()
 
     try {
-      //val token: String = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjBiZDEwY2JmMDM2OGQ2MWE0NDBiZjYxZjNiM2EyZDI0NGExODQ5NDcifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhdF9oYXNoIjoib2ljcGdidS00Q1d1SFdLSEdNRDZ4dyIsImF1ZCI6Ijg0ODIzMjUxMTI0MC03M3JpM3Q3cGx2azk2cGo0Zjg1dWo4b3RkYXQyYWxlbS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMTQyMTY1MjcxMjA1NzEwMDc1MCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhenAiOiI4NDgyMzI1MTEyNDAtNzNyaTN0N3Bsdms5NnBqNGY4NXVqOG90ZGF0MmFsZW0uYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6ImFhcmlhc3RhQGdtYWlsLmNvbSIsImlhdCI6MTQ2OTU0Nzk5NiwiZXhwIjoxNDY5NTUxNTk2fQ.CEFnZW6nikCiGiF-_YtvgiZuK7GRHDlUlGCor0ZkCYKYb2ULntMj741JMWaWnG_RScpj_lycsFrAmGlxvy9qdv-0oOM5bmOIGjYPQVBSrYXncJ5lazAHlnIplUICHgv_bfE00C_yuaShCkLgBpXoaOgHdQp86WlBqLHb8CN3NBJk2CUUKZa6skTFGDOEgTgwSE1JEaanTTKr-3b6sfod-hwTbEIsMO5IoNNma4jp7E1LACl_3VBN1hOA4ZbTvOReSSVztkcIIdPTcM8styinPAg983u5nn_fApxHcvgK-m5-SUS9KWp9EsJkVQAstbP79Dg5SJrnq3ubm0r-4Z5z9g"
-      val builder: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.Builder = RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.newBuilder
-      builder.setProvider("google")
-      builder.setToken(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.JWT.newBuilder.setContents(findPokemon.token).setUnknown2(59).build)
-      auth = builder.build
 
+      //val auth2 = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+      val auth = new GoogleCredentialProvider(http, findPokemon.token); // currently uses oauth flow so no user or pass needed
       val go: PokemonGo = new PokemonGo(auth, http)
+
+
       //6.254010, -75.578931
       go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)
 
@@ -39,7 +39,7 @@ class PokemonServices {
       println("Pokemon in area:" + catchablePokemon.size)
 
       catchablePokemon.foreach(cp => {
-          listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, cp.getExpirationTimestampMs, Some(Position(cp.getLatitude, cp.getLongitude))))
+        listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, cp.getExpirationTimestampMs, Some(Position(cp.getLatitude, cp.getLongitude))))
       })
 
       /*val nearPokemonList: List[NearbyPokemon] = go.getMap.getNearbyPokemon().toList
@@ -64,15 +64,11 @@ class PokemonServices {
 
   def getGyms(findPokemon: FindPokemon): List[Gym] = {
     val http: OkHttpClient = new OkHttpClient
-    var auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo = null
 
     try {
-      val builder: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.Builder = RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.newBuilder
-      builder.setProvider("google")
-      builder.setToken(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.JWT.newBuilder.setContents(findPokemon.token).setUnknown2(59).build)
-      auth = builder.build
-
+      val auth = new GoogleCredentialProvider(http, findPokemon.token); // currently uses oauth flow so no user or pass needed
       val go: PokemonGo = new PokemonGo(auth, http)
+
       go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)
       //val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.lat.get, findPokemon.lon.get)
       val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.width)
@@ -93,17 +89,11 @@ class PokemonServices {
 
   def getPokeStop(findPokemon: FindPokemon): List[Stop] = {
     val http: OkHttpClient = new OkHttpClient
-    var auth: POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo = null
 
     // var listPokeParadas = List[Stop]()
 
     try {
-      val builder: POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.Builder = POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.newBuilder
-      builder.setProvider("google")
-      builder.setToken(POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.JWT.newBuilder.setContents(findPokemon.token).setUnknown2(59).build)
-      auth = builder.build
-
-
+      val auth = new GoogleCredentialProvider(http, findPokemon.token); // currently uses oauth flow so no user or pass needed
       val go: PokemonGo = new PokemonGo(auth, http)
       go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)
       //val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.lat.get, findPokemon.lon.get)
@@ -113,10 +103,10 @@ class PokemonServices {
       println("PokeStops :" + spawnPoints.getPokestops.size())
 
       // for(stop <- spawnPoints.getPokestops ){
-        //  listPokeParadas = listPokeParadas ++ List(Stop(stop.getDetails.getDescription, Position(stop.getLatitude, stop.getLongitude)))
-        // }
+      //  listPokeParadas = listPokeParadas ++ List(Stop(stop.getDetails.getDescription, Position(stop.getLatitude, stop.getLongitude)))
+      // }
 
-     val pokeStops = spawnPoints.getPokestops.map(stop => Stop("", Position(stop.getLatitude, stop.getLongitude)))
+      val pokeStops = spawnPoints.getPokestops.map(stop => Stop("", Position(stop.getLatitude, stop.getLongitude)))
       pokeStops.toList
 
     }
@@ -131,14 +121,9 @@ class PokemonServices {
 
   def getCatchablePokemon {
     val http: OkHttpClient = new OkHttpClient
-    var auth: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo = null
     try {
       val token: String = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjBiZDEwY2JmMDM2OGQ2MWE0NDBiZjYxZjNiM2EyZDI0NGExODQ5NDcifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhdF9oYXNoIjoib2ljcGdidS00Q1d1SFdLSEdNRDZ4dyIsImF1ZCI6Ijg0ODIzMjUxMTI0MC03M3JpM3Q3cGx2azk2cGo0Zjg1dWo4b3RkYXQyYWxlbS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMTQyMTY1MjcxMjA1NzEwMDc1MCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhenAiOiI4NDgyMzI1MTEyNDAtNzNyaTN0N3Bsdms5NnBqNGY4NXVqOG90ZGF0MmFsZW0uYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6ImFhcmlhc3RhQGdtYWlsLmNvbSIsImlhdCI6MTQ2OTU0Nzk5NiwiZXhwIjoxNDY5NTUxNTk2fQ.CEFnZW6nikCiGiF-_YtvgiZuK7GRHDlUlGCor0ZkCYKYb2ULntMj741JMWaWnG_RScpj_lycsFrAmGlxvy9qdv-0oOM5bmOIGjYPQVBSrYXncJ5lazAHlnIplUICHgv_bfE00C_yuaShCkLgBpXoaOgHdQp86WlBqLHb8CN3NBJk2CUUKZa6skTFGDOEgTgwSE1JEaanTTKr-3b6sfod-hwTbEIsMO5IoNNma4jp7E1LACl_3VBN1hOA4ZbTvOReSSVztkcIIdPTcM8styinPAg983u5nn_fApxHcvgK-m5-SUS9KWp9EsJkVQAstbP79Dg5SJrnq3ubm0r-4Z5z9g"
-      val builder: RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.Builder = RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.newBuilder
-      builder.setProvider("google")
-      builder.setToken(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.JWT.newBuilder.setContents(token).setUnknown2(59).build)
-      auth = builder.build
-
+      val auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
       val go: PokemonGo = new PokemonGo(auth, http)
       go.setLocation(6.254010, -75.578931, 0)
 
