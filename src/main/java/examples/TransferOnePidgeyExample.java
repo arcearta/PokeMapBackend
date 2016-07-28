@@ -20,6 +20,7 @@ import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
 import POGOProtos.Networking.Responses.ReleasePokemonResponseOuterClass;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.pokemon.Pokemon;
+import com.pokegoapi.auth.GoogleCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
@@ -35,12 +36,13 @@ public class TransferOnePidgeyExample {
 	 */
 	public static void main(String[] args) {
 		OkHttpClient http = new OkHttpClient();
-		RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo auth = null;
 		try {
 
 			//auth = new PtcLogin(http).login(com.pokegoapi.examples.ExampleLoginDetails.LOGIN, com.pokegoapi.examples.ExampleLoginDetails.PASSWORD);
 			// or google
-			auth = new com.pokegoapi.auth.GoogleLogin(http).login("", ""); // currently uses oauth flow so no user or pass needed
+			String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjBiZDEwY2JmMDM2OGQ2MWE0NDBiZjYxZjNiM2EyZDI0NGExODQ5NDcifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhdF9oYXNoIjoib2ljcGdidS00Q1d1SFdLSEdNRDZ4dyIsImF1ZCI6Ijg0ODIzMjUxMTI0MC03M3JpM3Q3cGx2azk2cGo0Zjg1dWo4b3RkYXQyYWxlbS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMTQyMTY1MjcxMjA1NzEwMDc1MCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhenAiOiI4NDgyMzI1MTEyNDAtNzNyaTN0N3Bsdms5NnBqNGY4NXVqOG90ZGF0MmFsZW0uYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6ImFhcmlhc3RhQGdtYWlsLmNvbSIsImlhdCI6MTQ2OTU0Nzk5NiwiZXhwIjoxNDY5NTUxNTk2fQ.CEFnZW6nikCiGiF-_YtvgiZuK7GRHDlUlGCor0ZkCYKYb2ULntMj741JMWaWnG_RScpj_lycsFrAmGlxvy9qdv-0oOM5bmOIGjYPQVBSrYXncJ5lazAHlnIplUICHgv_bfE00C_yuaShCkLgBpXoaOgHdQp86WlBqLHb8CN3NBJk2CUUKZa6skTFGDOEgTgwSE1JEaanTTKr-3b6sfod-hwTbEIsMO5IoNNma4jp7E1LACl_3VBN1hOA4ZbTvOReSSVztkcIIdPTcM8styinPAg983u5nn_fApxHcvgK-m5-SUS9KWp9EsJkVQAstbP79Dg5SJrnq3ubm0r-4Z5z9g";
+
+			GoogleCredentialProvider auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
 			PokemonGo go = new PokemonGo(auth, http);
 
 			List<Pokemon> pidgeys =
