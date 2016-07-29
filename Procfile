@@ -1,1 +1,1 @@
-web: target/universal/stage/bin/PokeMapBackend -Dhttp.port=${PORT} -DapplyEvolutions.default=true
+web: target/universal/stage/bin/pokemapbackend -Dhttp.port=${PORT} -DapplyEvolutions.default=true

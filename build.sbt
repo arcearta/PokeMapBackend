@@ -1,6 +1,6 @@
 enablePlugins(JavaAppPackaging)
 
-name := "PokeMapBackend"
+name := "pokemapbackend"
 organization := "com.theiterators"
 version := "1.0"
 scalaVersion := "2.11.8"
@@ -8,9 +8,7 @@ scalaVersion := "2.11.8"
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
-resolvers ++= Seq(
-  "io"           at "https://jitpack.io"
-)
+resolvers += "jitpack" at "https://jitpack.io"
 
 
 libraryDependencies ++= {
@@ -21,7 +19,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-stream" % akkaV,
     "com.typesafe.akka" %% "akka-http-experimental" % akkaV,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaV,
-    "com.github.Grover-c13" %% "PokeGOAPI-Java" % "master-SNAPSHOT",
+    "com.github.Grover-c13" % "PokeGOAPI-Java" % "0.2",
     "com.typesafe.akka" %% "akka-http-testkit" % akkaV,
     "net.databinder.dispatch"    %% "dispatch-core"          % "0.11.3" exclude("com.ning", "async-http-client"),
     "com.ning"                    % "async-http-client"      % "1.9.38",
