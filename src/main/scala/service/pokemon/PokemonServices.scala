@@ -25,10 +25,16 @@ class PokemonServices {
 
     try {
 
-      //val auth2 = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
-      val auth = new GoogleCredentialProvider(http, findPokemon.token); // currently uses oauth flow so no user or pass needed
-      val go: PokemonGo = new PokemonGo(auth, http)
+      var auth:CredentialProvider = null
 
+      if(findPokemon.token.isDefined){
+        //val auth2 = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+        auth = new GoogleCredentialProvider(http, findPokemon.token.get); // currently uses oauth flow so no user or pass needed
+      }else{
+        auth = new PtcCredentialProvider(http, "pokeservices", "pokeservices")
+      }
+
+      val go: PokemonGo = new PokemonGo(auth, http)
 
       //6.254010, -75.578931
       go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)
@@ -66,7 +72,15 @@ class PokemonServices {
     val http: OkHttpClient = new OkHttpClient
 
     try {
-      val auth = new GoogleCredentialProvider(http, findPokemon.token); // currently uses oauth flow so no user or pass needed
+      var auth:CredentialProvider = null
+
+      if(findPokemon.token.isDefined){
+        //val auth2 = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+        auth = new GoogleCredentialProvider(http, findPokemon.token.get); // currently uses oauth flow so no user or pass needed
+      }else{
+        auth = new PtcCredentialProvider(http, "pokeservices", "pokeservices")
+      }
+
       val go: PokemonGo = new PokemonGo(auth, http)
 
       go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)
@@ -93,7 +107,17 @@ class PokemonServices {
     // var listPokeParadas = List[Stop]()
 
     try {
-      val auth = new GoogleCredentialProvider(http, findPokemon.token); // currently uses oauth flow so no user or pass needed
+      var auth:CredentialProvider = null
+
+      if(findPokemon.token.isDefined){
+        println("autenticando con token en google")
+        //val auth2 = new PtcCredentialProvider(http, ExampleLoginDetails.LOGIN, ExampleLoginDetails.PASSWORD);
+        auth = new GoogleCredentialProvider(http, findPokemon.token.get); // currently uses oauth flow so no user or pass needed
+      }else{
+        println("autenticando con pokemon trainer club")
+        auth = new PtcCredentialProvider(http, "pokeservices", "pokeservices")
+      }
+
       val go: PokemonGo = new PokemonGo(auth, http)
       go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)
       //val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.lat.get, findPokemon.lon.get)
