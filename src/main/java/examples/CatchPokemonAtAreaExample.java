@@ -38,7 +38,7 @@ import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.api.map.MapObjects;
 import com.pokegoapi.api.map.pokemon.CatchResult;
 import com.pokegoapi.api.map.pokemon.CatchablePokemon;
-import com.pokegoapi.api.map.pokemon.EncounterResult;
+
 import com.pokegoapi.auth.GoogleCredentialProvider;
 import com.pokegoapi.auth.PtcCredentialProvider;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -66,6 +66,11 @@ public class CatchPokemonAtAreaExample {
 
 			PokemonGo go = new PokemonGo(new PtcCredentialProvider(http, "pokeservices", "pokeservices"), http);
 			// set location
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			go.setLocation(6.254010, -75.578931, 0);
 
 			MapObjects spawnPoints  = go.getMap().getMapObjects(5);

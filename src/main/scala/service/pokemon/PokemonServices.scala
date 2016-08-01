@@ -4,7 +4,7 @@ import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon
 import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
-import com.pokegoapi.api.map.pokemon.{CatchResult, CatchablePokemon, EncounterResult}
+import com.pokegoapi.api.map.pokemon.{CatchResult, CatchablePokemon}
 import com.pokegoapi.util.Log
 import dto._
 import okhttp3.OkHttpClient
@@ -154,14 +154,14 @@ class PokemonServices {
       val catchablePokemon: List[CatchablePokemon] = go.getMap.getCatchablePokemon.toList
       println("Pokemon in area:" + catchablePokemon.size)
 
-      catchablePokemon.foreach(cp => {
+      /*catchablePokemon.foreach(cp => {
         val encResult: EncounterResult = cp.encounterPokemon
         if (encResult.wasSuccessful) {
           println("Encounted:" + cp.getPokemonId)
           val result: CatchResult = cp.catchPokemonWithRazzBerry
           println("Attempt to catch:" + cp.getPokemonId + " " + result.getStatus)
         }
-      })
+      })*/
 
 
       val spawnPoints: MapObjects = go.getMap.getMapObjects(6.254010, -75.578931)
