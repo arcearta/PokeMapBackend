@@ -1,7 +1,6 @@
 enablePlugins(JavaAppPackaging)
 
-name := "pokemapbackend"
-organization := "com.theiterators"
+name := """pokemapbackend"""
 version := "1.0"
 scalaVersion := "2.11.8"
 
