@@ -1,14 +1,15 @@
-enablePlugins(JavaAppPackaging)
 
 name := """pokemapbackend"""
 version := "1.0"
+version := "1.0"
 scalaVersion := "2.11.8"
+
+lazy val root = (project in file(".")).enablePlugins(JavaAppPackaging)
 
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 resolvers += "jitpack" at "https://jitpack.io"
-
 
 libraryDependencies ++= {
   val akkaV       = "2.4.3"
@@ -27,4 +28,4 @@ libraryDependencies ++= {
   )
 }
 
-Revolver.settings
+//Revolver.settings
