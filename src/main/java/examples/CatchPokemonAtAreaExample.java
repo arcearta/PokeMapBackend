@@ -30,84 +30,174 @@
 
 package examples;
 
-
-import POGOProtos.Map.Fort.FortDataOuterClass;
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass;
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass;
-import com.pokegoapi.api.PokemonGo;
-import com.pokegoapi.api.map.MapObjects;
-import com.pokegoapi.api.map.pokemon.CatchResult;
-import com.pokegoapi.api.map.pokemon.CatchablePokemon;
 
-import com.pokegoapi.auth.GoogleCredentialProvider;
-import com.pokegoapi.auth.PtcCredentialProvider;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass;
+import com.google.api.client.googleapis.auth.oauth2.*;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.pokegoapi.api.PokemonGo;
+
+import com.pokegoapi.api.map.MapObjects;
+
+import com.pokegoapi.auth.*;
 import com.pokegoapi.exceptions.LoginFailedException;
 import com.pokegoapi.exceptions.RemoteServerException;
 import com.pokegoapi.util.Log;
 import okhttp3.OkHttpClient;
 
-import java.util.Collection;
-import java.util.List;
+import java.io.*;
+
+import java.util.Scanner;
+
 
 public class CatchPokemonAtAreaExample {
 
-	/**
-	 * Catches a pokemon at an area.
-	 */
-	public static void main(String[] args) {
-		OkHttpClient http = new OkHttpClient();
-		try {
-			//auth = new PtcLogin(http).login(com.pokegoapi.examples.ExampleLoginDetails.LOGIN, com.pokegoapi.examples.ExampleLoginDetails.PASSWORD);
-			// or google
-			//String token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjBiZDEwY2JmMDM2OGQ2MWE0NDBiZjYxZjNiM2EyZDI0NGExODQ5NDcifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhdF9oYXNoIjoib2ljcGdidS00Q1d1SFdLSEdNRDZ4dyIsImF1ZCI6Ijg0ODIzMjUxMTI0MC03M3JpM3Q3cGx2azk2cGo0Zjg1dWo4b3RkYXQyYWxlbS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMTQyMTY1MjcxMjA1NzEwMDc1MCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhenAiOiI4NDgyMzI1MTEyNDAtNzNyaTN0N3Bsdms5NnBqNGY4NXVqOG90ZGF0MmFsZW0uYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6ImFhcmlhc3RhQGdtYWlsLmNvbSIsImlhdCI6MTQ2OTU0Nzk5NiwiZXhwIjoxNDY5NTUxNTk2fQ.CEFnZW6nikCiGiF-_YtvgiZuK7GRHDlUlGCor0ZkCYKYb2ULntMj741JMWaWnG_RScpj_lycsFrAmGlxvy9qdv-0oOM5bmOIGjYPQVBSrYXncJ5lazAHlnIplUICHgv_bfE00C_yuaShCkLgBpXoaOgHdQp86WlBqLHb8CN3NBJk2CUUKZa6skTFGDOEgTgwSE1JEaanTTKr-3b6sfod-hwTbEIsMO5IoNNma4jp7E1LACl_3VBN1hOA4ZbTvOReSSVztkcIIdPTcM8styinPAg983u5nn_fApxHcvgK-m5-SUS9KWp9EsJkVQAstbP79Dg5SJrnq3ubm0r-4Z5z9g";
+    public static GoogleCredentialProvider auth;
 
-			//GoogleCredentialProvider auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
-			//PokemonGo go = new PokemonGo(auth, http);
-
-			PokemonGo go = new PokemonGo(new PtcCredentialProvider(http, "pokeservices", "pokeservices"), http);
-			// set location
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			go.setLocation(6.254010, -75.578931, 0);
-
-			MapObjects spawnPoints  = go.getMap().getMapObjects(5);
-
-			Collection<MapPokemonOuterClass.MapPokemon> catchablePokemon = spawnPoints.getCatchablePokemons();
-			System.out.println("Pokemon in area:" + catchablePokemon.size());
-
-			for (MapPokemonOuterClass.MapPokemon cp : catchablePokemon) {
-
-					System.out.println("Encounted:" + cp.getPokemonId());
-
-			}
+    public InputStream getUrl() {
+        return this.getClass().getResourceAsStream("/" + "client_secret.json");
+    }
 
 
-			MapObjects spawnPoints2 = go.getMap().getMapObjects(6.254010, -75.578931);
-			System.out.println("Point in area:" + spawnPoints2.isComplete());
+    /**
+     * Catches a pokemon at an area.
+     */
+    public static void main(String[] args) {
+        //aut_code=4/_rd0zUigh7awDOjpOxm165EgbhicJVOXLC3UXclp4V8
+        //refresh=1/tonF2rg3bavTh84gxnN9OC3_xLVr5YK5ZO1xWwNeGmE
+        CatchPokemonAtAreaExample catchPokemonAtAreaExample = new CatchPokemonAtAreaExample();
+
+        OkHttpClient http = new OkHttpClient();
+        try {
+            /*RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.Builder builder = RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.newBuilder();
+            builder.setProvider("google");
+            builder.setToken(RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo.JWT.newBuilder().setContents(token.getIdToken()).setUnknown2(59).build());
+            builder.build();*/
+
+          // GoogleAutoCredentialProvider auth = new GoogleAutoCredentialProvider(http, "iotpruebas@gmail.com", "Sura2016");
+
+           String auth_code = "4/zpZA538lVhOw-3ei_EFgwJKHR4C0UOOHt2eX79tU8sk";
+
+            String refreshToken = "";
+
+            // Exchange auth code for access token
+            //refreshToken = getRefreshToken(catchPokemonAtAreaExample, auth_code);
+            //System.out.println("Refresh token Generado: " + refreshToken);
+
+            refreshToken = "1/tonF2rg3bavTh84gxnN9OC3_xLVr5YK5ZO1xWwNeGmE";
+
+           // SimpleCredentialProvider auth = new SimpleCredentialProvider(http, refreshToken);
+
+           // GoogleUserCredentialProvider provider = autWitGoogle(http);
+
+            //System.out.println(provider.getRefreshToken());
+            GoogleCredentialProvider auth = new GoogleCredentialProvider(http, refreshToken);
+
+            //GoogleUserCredentialProvider provider = new GoogleUserCredentialProvider(http);
+            //provider.login(auth_code);
+            //GoogleCredentialProvider auth = new GoogleCredentialProvider(http, provider.getRefreshToken());
+
+            //PokemonGo go = new PokemonGo(new PtcCredentialProvider(http, "pokeservices", "pokeservices"), http);
+            System.out.println("1111111");
+            PokemonGo go = new PokemonGo(auth, http);
+
+            System.out.println("222222");
+            try {
+                Thread.sleep(6000);
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Username:" + go.getPlayerProfile().getPlayerData().getUsername());
+
+            //go.setLocation(6.254010, -75.578931, 1);
+            go.setLocation(6.2538345, -75.57843804, 1);
+
+            MapObjects spawnPoints = null;
+
+            try {
+                spawnPoints = go.getMap().getMapObjects(9);
+
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("Pokemon in area:" + spawnPoints.getCatchablePokemons().size());
+            for (MapPokemonOuterClass.MapPokemon cp : spawnPoints.getCatchablePokemons()) {
+                System.out.println("Pokemon name:" + cp.getPokemonId().name());
+                System.out.println("Pokemon id:" + cp.getPokemonId().getNumber());
+                System.out.println("Pokemon latitud:" + cp.getLatitude());
+                System.out.println("Pokemon longitud:" + cp.getLongitude());
+            }
+
+            System.out.println("-------------------------------------------");
+            System.out.println("Gym in area:" + spawnPoints.getGyms().size());
+            System.out.println("Stop in area:" + spawnPoints.getPokestops().size());
+
+            System.out.println("Near in area:" + spawnPoints.getNearbyPokemons().size());
+
+            for(NearbyPokemonOuterClass.NearbyPokemon pokemon : spawnPoints.getNearbyPokemons()){
+                System.out.println(pokemon.getPokemonId());
+            }
 
 
-
-			for (FortDataOuterClass.FortData cp : spawnPoints2.getGyms()) {
-				// You need to Encounter first.
-
-				// if encounter was succesful, catch
-
-					System.out.println("latitud:" + cp.getLatitude());
-				System.out.println("longitud:" + cp.getLongitude());
-				System.out.println("nombre:" + cp.getSponsor().name());
-				System.out.println("color:" + cp.getOwnedByTeam().name());
+        } catch (LoginFailedException e) {
+            Log.e("Main", "Failed to login or server issue: ", e);
+            e.printStackTrace();
+        } catch (RemoteServerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
-			}
+    }
+
+    private static GoogleUserCredentialProvider autWitGoogle(OkHttpClient http) throws LoginFailedException, RemoteServerException {
+        GoogleUserCredentialProvider provider = new GoogleUserCredentialProvider(http);
+
+        // in this url, you will get a code for the google account that is logged
+        System.out.println("Please go to " + GoogleUserCredentialProvider.LOGIN_URL);
+        System.out.println("Enter authorisation code:");
 
 
-		} catch (LoginFailedException | RemoteServerException e) {
-			// failed to login, invalid credentials, auth issue or server issue.
-			Log.e("Main", "Failed to login or server issue: ", e);
+        // Ask the user to enter it in the standart input
+        Scanner sc = new Scanner(System.in);
+        String access = sc.nextLine();
 
-		}
-	}
+        // we should be able to login with this token
+        provider.login(access);
+        return provider;
+    }
+
+
+    private static String getRefreshToken(CatchPokemonAtAreaExample catchPokemonAtAreaExample, String auth_code) throws IOException {
+
+        GoogleClientSecrets clientSecrets =
+                GoogleClientSecrets.load(
+                        JacksonFactory.getDefaultInstance(), new BufferedReader(new InputStreamReader(catchPokemonAtAreaExample.getUrl()
+                        )));
+
+
+        GoogleTokenResponse tokenResponse =
+                new GoogleAuthorizationCodeTokenRequest(
+                        new NetHttpTransport(),
+                        JacksonFactory.getDefaultInstance(),
+                        "https://www.googleapis.com/oauth2/v4/token",
+                        clientSecrets.getDetails().getClientId(),
+                        clientSecrets.getDetails().getClientSecret(),
+                        auth_code,
+                        "")  // Specify the same redirect URI that you use with your web
+                        // app. If you don't have a web version of your app, you can
+                        // specify an empty string.
+                        .execute();
+
+
+        String accessToken = tokenResponse.getAccessToken();
+        String refreshToken =  tokenResponse.getRefreshToken();//"1/XQ6Nd4Xk_2mncX6Ajy54qyMezHBbfu-RY6qtUbuWU-Q";
+
+        System.out.println(refreshToken);
+        return refreshToken;
+    }
 }

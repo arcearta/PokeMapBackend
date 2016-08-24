@@ -12,7 +12,7 @@ class ServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest with Se
   override def config = testConfig
   override val logger = NoLogging
 
-  val ip1Info = IpInfo(
+  /*val ip1Info = IpInfo(
                       "8.8.8.8",
                       Option("United States"),
                       Option("Mountain View"),
@@ -72,5 +72,5 @@ class ServiceSpec extends FlatSpec with Matchers with ScalatestRouteTest with Se
       status shouldBe BadRequest
       responseAs[String].length should be > 0
     }
-  }
+  }*/
 }
