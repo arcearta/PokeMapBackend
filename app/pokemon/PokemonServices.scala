@@ -112,6 +112,12 @@ class PokemonServices extends App{
     (auth, http)
   }
 
+  def getRefresh(findPokemon: FindPokemon) = {
+    val refres = refreshMyToken(findPokemon.token.get)
+    println("New Refres generado: " + refres)
+    refres
+  }
+
   def getAllNearPokemons(findPokemon: FindPokemon): List[PokemonPosition] = {
     val http: OkHttpClient = new OkHttpClient
     var listPokemons = List[PokemonPosition]()

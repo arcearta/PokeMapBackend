@@ -93,6 +93,19 @@ object Application  extends Controller with Service {
     Ok( Json.toJson(pokemonList))
   }
 
+  def getRefresh = Action.async(parse.json) { implicit request =>
+
+    request.body.validate[FindPokemon].map{
+      case find => {
+        val pokemonService = new PokemonServices
+        val ref = pokemonService.getRefresh(find)
+        Future(Ok(Json.toJson( ref )))
+      }
+    }.recoverTotal{
+      e => Future(BadRequest("Detected error:"+ JsError.toFlatJson(e)))
+    }
+  }
+
   def findActivePokemon = Action.async(parse.json) { implicit request =>
 
     request.body.validate[FindPokemon].map{
