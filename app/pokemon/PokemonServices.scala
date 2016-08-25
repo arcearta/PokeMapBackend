@@ -68,7 +68,12 @@ class PokemonServices extends App{
     }else{
       val clientSecrets: GoogleClientSecrets = GoogleClientSecrets.load(JacksonFactory.getDefaultInstance, new BufferedReader(new InputStreamReader(getUrl)))
       println("paso1: " +clientSecrets.getDetails.getClientSecret )
-      val tokenResponse: GoogleTokenResponse = new GoogleAuthorizationCodeTokenRequest(new NetHttpTransport, JacksonFactory.getDefaultInstance, "https://www.googleapis.com/oauth2/v4/token", clientSecrets.getDetails.getClientId, clientSecrets.getDetails.getClientSecret, auth_code, "").execute
+      println("autcode: " +auth_code )
+      val tokenResponse: GoogleTokenResponse = new GoogleAuthorizationCodeTokenRequest(new NetHttpTransport,
+                                                                                  JacksonFactory.getDefaultInstance,
+                                                                                  "https://www.googleapis.com/oauth2/v4/token",
+                                                                                    clientSecrets.getDetails.getClientId,
+                                                                                    clientSecrets.getDetails.getClientSecret, auth_code, "").execute
       println("paso2: " + tokenResponse )
       val accessToken: String = tokenResponse.getAccessToken
       refreshToken= tokenResponse.getRefreshToken
@@ -88,7 +93,7 @@ class PokemonServices extends App{
   }
 
   def authenticate(token : Option[String], http : OkHttpClient): (CredentialProvider, OkHttpClient) = {
-    var auth:CredentialProvider = null
+    var auth:GoogleCredentialProvider = null
 
     /*if (token.isDefined && !"".equals(token.get)) {
 
@@ -108,7 +113,11 @@ class PokemonServices extends App{
     } dsf*/
     println("autenticando con itpruebas")
     //auth = new GoogleAutoCredentialProvider(http, "iotpruebas@gmail.com", "Sura2016")
-    auth = new GoogleCredentialProvider(http, token.get)
+    val provider: GoogleUserCredentialProvider = new GoogleUserCredentialProvider(http)
+    provider.login(token.get)
+    //provider
+    auth = new GoogleCredentialProvider(http, provider.getRefreshToken)
+    //auth = new GoogleCredentialProvider(http, token.get)
     (auth, http)
   }
 
@@ -123,6 +132,7 @@ class PokemonServices extends App{
     var listPokemons = List[PokemonPosition]()
     try {
       val datos = authenticate(findPokemon.token, http)
+
       val go: PokemonGo = new PokemonGo(datos._1, datos._2)
 
       Thread.sleep(4000)
