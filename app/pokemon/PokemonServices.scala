@@ -16,6 +16,7 @@ import com.pokegoapi.util.Log
 import dto._
 import okhttp3.OkHttpClient
 import com.pokegoapi.auth._
+import tools.Crypter
 
 import scala.collection.JavaConversions._
 
@@ -94,37 +95,22 @@ class PokemonServices extends App{
 
   def authenticate(token : Option[String], http : OkHttpClient): (CredentialProvider, OkHttpClient) = {
     var auth:GoogleCredentialProvider = null
+    val decryptedValue: String = Crypter.decryptAES(token.get)
 
-    /*if (token.isDefined && !"".equals(token.get)) {
-
-      println("Autenticando en google")
-      val refres = refreshMyToken(token.get)
-      println("Autenticando en google: refr : " + refres)
-      if (refres == null || "".equals(refres)) {
-        println("Autenticando con usuario y password")
-        auth = new GoogleAutoCredentialProvider(http, "iotpruebas@gmail.com", "Sura2016")
-      } else {
-        auth = new GoogleCredentialProvider(http, refres)
-      }
-      //auth = new GoogleCredentialProvider(http, findPokemon.token.get); // currently uses oauth flow so no user or pass needed
-    } else {
-      println("Autenticando en PTC")
-      auth = new PtcCredentialProvider(http, "pokeservices", "pokeservices")
-    } dsf*/
-    println("autenticando con itpruebas")
-    //auth = new GoogleAutoCredentialProvider(http, "iotpruebas@gmail.com", "Sura2016")
     val provider: GoogleUserCredentialProvider = new GoogleUserCredentialProvider(http)
-    provider.login(token.get)
-    //provider
-    auth = new GoogleCredentialProvider(http, provider.getRefreshToken)
-    //auth = new GoogleCredentialProvider(http, token.get)
+    //provider.login(decryptedValue)
+    auth = new GoogleCredentialProvider(http, decryptedValue)
     (auth, http)
   }
 
-  def getRefresh(findPokemon: FindPokemon) = {
-    val refres = refreshMyToken(findPokemon.token.get)
-    println("New Refres generado: " + refres)
-    refres
+  def getRefresh(auth_code: String):String = {
+    //val refres = refreshMyToken(auth_code)
+    val http: OkHttpClient = new OkHttpClient
+    val provider: GoogleUserCredentialProvider = new GoogleUserCredentialProvider(http)
+    provider.login(auth_code)
+    val encryptedValue: String = Crypter.encryptAES(provider.getRefreshToken)
+    println("New Refres generado crypte: " + encryptedValue)
+    encryptedValue
   }
 
   def getAllNearPokemons(findPokemon: FindPokemon): List[PokemonPosition] = {

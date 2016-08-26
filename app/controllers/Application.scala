@@ -26,6 +26,9 @@ import play.api.libs.concurrent.Execution.Implicits._
 import scala.concurrent.ExecutionContext.Implicits.global._
 
 trait Protocols {
+
+  implicit val tokenFormat = Json.writes[Token]
+  implicit val tokenReadFormat = Json.reads[Token]
   implicit val pokemonPositionFormat = Json.writes[Position]
   implicit val pokemonPositionReadFormat = Json.reads[Position]
 
@@ -86,7 +89,8 @@ object Application  extends Controller with Service {
 
 
   def index = Action {
-    Ok(views.html.index(null))
+    //Ok(views.html.index(null))
+    Ok("exto")
   }
 
   def findPokemon = Action {
@@ -95,10 +99,10 @@ object Application  extends Controller with Service {
 
   def getRefresh = Action.async(parse.json) { implicit request =>
 
-    request.body.validate[FindPokemon].map{
+    request.body.validate[Token].map{
       case find => {
         val pokemonService = new PokemonServices
-        val ref = pokemonService.getRefresh(find)
+        val ref = pokemonService.getRefresh(find.auth_code)
         Future(Ok(Json.toJson( ref )))
       }
     }.recoverTotal{

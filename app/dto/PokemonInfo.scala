@@ -3,6 +3,7 @@ package dto
 /**
   * Created by arcearta on 2016/07/17.
   */
+case  class Token(auth_code : String)
 case  class PokemonInfo(name : String , typePokemon: String)
 
 case  class FindPokemon(token : Option[String], width : Int, name : Option[String], position: Option[Position])
