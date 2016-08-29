@@ -3,15 +3,12 @@ package pokemon
 import java.io.{BufferedReader, IOException, InputStream, InputStreamReader}
 
 import POGOProtos.Map.Pokemon.MapPokemonOuterClass.MapPokemon
-import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon
 import POGOProtos.Map.Pokemon.WildPokemonOuterClass.WildPokemon
-import POGOProtos.Networking.Envelopes.RequestEnvelopeOuterClass.RequestEnvelope.AuthInfo
 import com.google.api.client.googleapis.auth.oauth2.{GoogleAuthorizationCodeTokenRequest, GoogleClientSecrets, GoogleTokenResponse}
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
-import com.pokegoapi.api.map.pokemon.CatchablePokemon
 import com.pokegoapi.util.Log
 import dto._
 import okhttp3.OkHttpClient
@@ -23,8 +20,6 @@ import scala.collection.JavaConversions._
 /**
   * Created by arcearta on 2016/07/26.
   */
-
-
 class PokemonServices extends App{
 
   override def main(args: Array[String]) {
@@ -104,12 +99,10 @@ class PokemonServices extends App{
   }
 
   def getRefresh(auth_code: String):String = {
-    //val refres = refreshMyToken(auth_code)
     val http: OkHttpClient = new OkHttpClient
     val provider: GoogleUserCredentialProvider = new GoogleUserCredentialProvider(http)
     provider.login(auth_code)
     val encryptedValue: String = Crypter.encryptAES(provider.getRefreshToken)
-    println("New Refres generado crypte: " + encryptedValue)
     encryptedValue
   }
 
@@ -234,7 +227,6 @@ class PokemonServices extends App{
       go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)
       val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.width)
 
-      println("Point in area:" + spawnPoints.isComplete)
       println("Gyms :" + spawnPoints.getGyms.size())
 
       val listGyms = spawnPoints.getGyms.toList.map(gym => Gym(gym.getOwnedByTeam.name, Position(gym.getLatitude, gym.getLongitude)))
@@ -260,7 +252,6 @@ class PokemonServices extends App{
 
       val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.width)
 
-      println("Point in area:" + spawnPoints.isComplete)
       println("PokeStops :" + spawnPoints.getPokestops.size())
 
       val pokeStops = spawnPoints.getPokestops.map(stop => Stop("", Position(stop.getLatitude, stop.getLongitude)))
@@ -275,46 +266,5 @@ class PokemonServices extends App{
     }
   }
 
-
-  def getCatchablePokemon {
-    val http: OkHttpClient = new OkHttpClient
-    try {
-      val token: String = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjBiZDEwY2JmMDM2OGQ2MWE0NDBiZjYxZjNiM2EyZDI0NGExODQ5NDcifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhdF9oYXNoIjoib2ljcGdidS00Q1d1SFdLSEdNRDZ4dyIsImF1ZCI6Ijg0ODIzMjUxMTI0MC03M3JpM3Q3cGx2azk2cGo0Zjg1dWo4b3RkYXQyYWxlbS5hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsInN1YiI6IjExMTQyMTY1MjcxMjA1NzEwMDc1MCIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhenAiOiI4NDgyMzI1MTEyNDAtNzNyaTN0N3Bsdms5NnBqNGY4NXVqOG90ZGF0MmFsZW0uYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6ImFhcmlhc3RhQGdtYWlsLmNvbSIsImlhdCI6MTQ2OTU0Nzk5NiwiZXhwIjoxNDY5NTUxNTk2fQ.CEFnZW6nikCiGiF-_YtvgiZuK7GRHDlUlGCor0ZkCYKYb2ULntMj741JMWaWnG_RScpj_lycsFrAmGlxvy9qdv-0oOM5bmOIGjYPQVBSrYXncJ5lazAHlnIplUICHgv_bfE00C_yuaShCkLgBpXoaOgHdQp86WlBqLHb8CN3NBJk2CUUKZa6skTFGDOEgTgwSE1JEaanTTKr-3b6sfod-hwTbEIsMO5IoNNma4jp7E1LACl_3VBN1hOA4ZbTvOReSSVztkcIIdPTcM8styinPAg983u5nn_fApxHcvgK-m5-SUS9KWp9EsJkVQAstbP79Dg5SJrnq3ubm0r-4Z5z9g"
-      val auth = new GoogleCredentialProvider(http, token); // currently uses oauth flow so no user or pass needed
-      val go: PokemonGo = new PokemonGo(auth, http)
-      go.setLocation(6.254010, -75.578931, 0)
-
-      val catchablePokemon: List[CatchablePokemon] = go.getMap.getCatchablePokemon.toList
-      println("Pokemon in area:" + catchablePokemon.size)
-
-      /*catchablePokemon.foreach(cp => {
-        val encResult: EncounterResult = cp.encounterPokemon
-        if (encResult.wasSuccessful) {
-          println("Encounted:" + cp.getPokemonId)
-          val result: CatchResult = cp.catchPokemonWithRazzBerry
-          println("Attempt to catch:" + cp.getPokemonId + " " + result.getStatus)
-        }
-      })*/
-
-
-      val spawnPoints: MapObjects = go.getMap.getMapObjects(6.254010, -75.578931)
-
-      println("Point in area:" + spawnPoints.isComplete)
-
-      spawnPoints.getGyms.toList.foreach(cp => {
-        println("latitud:" + cp.getLatitude)
-        println("longitud:" + cp.getLongitude)
-        println("nombre:" + cp.getSponsor.name)
-        println("color:" + cp.getOwnedByTeam.name)
-      }
-      )
-
-    }
-    catch {
-      case e: Any => {
-        Log.e("Main", "Failed to login or server issue: ", e)
-      }
-    }
-  }
 
 }

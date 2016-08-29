@@ -5,11 +5,11 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /db                         controllers.Application.db
-GET     /findPokemon                controllers.Application.findPokemon
 POST    /findActivePokemon          controllers.Application.findActivePokemon
 POST    /findPokeStop               controllers.Application.findPokeStop
 POST    /findPokeGym                controllers.Application.findPokeGym
 POST    /getRefresh                 controllers.Application.getRefresh
+POST    /getHeaders                 controllers.Application.getHeaders
 
 
 # Map static resources from the /public folder to the /assets URL path
