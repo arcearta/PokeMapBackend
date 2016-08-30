@@ -80,6 +80,7 @@ object Application  extends Controller with Service {
         if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
           val ref = pokemonService.getRefresh(find.auth_code)
+          println("refreshgen: " + ref)
           Future(Ok(Json.toJson(ref)))
         }else{
           Future(BadRequest("Invalid request, check parameters and time zone."))
