@@ -58,12 +58,14 @@ object Application  extends Controller with Service {
 
   def checkBody(body : String, tokenValid : String): Boolean ={
 
-    println("tokenValid: " + tokenValid)
-    println("body: " + body)
+    println("----------tokenValid: " + tokenValid)
+    println("----------body: " + body)
     val encBody = PokeCipher.encrypt(body)
-    println("encBody: " + encBody)
+    println("---------encBody: " + encBody)
 
-    tokenValid.equals(encBody)
+    val resp = tokenValid.equals(encBody)
+    println("---------resp: " + resp)
+    resp
   }
 
   def getRefresh = Action.async(parse.json) { implicit request =>
@@ -142,9 +144,10 @@ object Application  extends Controller with Service {
         if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
           val respuesta = pokemonService.getGyms(find)
-
+          println("respuesta: " + respuesta)
           Future(Ok(Json.toJson(respuesta )))
         }else{
+          println("Check your request or your timezone.")
           Future(BadRequest("Check your request or your timezone."))
         }
       }
