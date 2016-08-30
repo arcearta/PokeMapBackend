@@ -5,7 +5,6 @@ import org.joda.time.{DateTime, DateTimeZone}
 import play.api.mvc._
 import play.api.Play.current
 import play.api.db._
-import play.api.http.Status._
 import pokemon.PokemonServices
 import play.api.libs.json._
 
@@ -58,7 +57,12 @@ object Application  extends Controller with Service {
 
 
   def checkBody(body : String, tokenValid : String): Boolean ={
+
+    println("tokenValid: " + tokenValid)
+    println("body: " + body)
     val encBody = PokeCipher.encrypt(body)
+    println("encBody: " + encBody)
+
     tokenValid.equals(encBody)
   }
 
@@ -71,13 +75,14 @@ object Application  extends Controller with Service {
     request.body.validate[Token].map{
       case find => {
 
-        val newFind = find.copy(aut_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
-        if(checkBody(newFind.toString, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+        val newFind = find.copy(auth_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
+        val strbody = Json.toJson(newFind).toString
+        if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
           val ref = pokemonService.getRefresh(find.auth_code)
           Future(Ok(Json.toJson(ref)))
         }else{
-          Future(BadRequest("Check your request or your timezone."))
+          Future(BadRequest("Invalid request, check parameters and time zone."))
         }
       }
     }.recoverTotal{
@@ -93,8 +98,9 @@ object Application  extends Controller with Service {
 
     request.body.validate[FindPokemon].map{
       case find => {
-        val newFind = find.copy(aut_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
-        if(checkBody(newFind.toString, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+        val newFind = find.copy(auth_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
+        val strbody = Json.toJson(newFind).toString
+        if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
           val respuesta = pokemonService.getCatchablePokemons(find)
           Future(Ok(Json.toJson(respuesta )))
@@ -111,8 +117,9 @@ object Application  extends Controller with Service {
 
     request.body.validate[FindPokemon].map{
       case find => {
-        val newFind = find.copy(aut_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
-        if(checkBody(newFind.toString, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+        val newFind = find.copy(auth_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
+        val strbody = Json.toJson(newFind).toString
+        if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
           val respuesta = pokemonService.getPokeStop(find)
           Future(Ok(Json.toJson(respuesta )))
@@ -129,8 +136,9 @@ object Application  extends Controller with Service {
 
     request.body.validate[FindPokemon].map{
       case find => {
-        val newFind = find.copy(aut_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
-        if(checkBody(newFind.toString, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+        val newFind = find.copy(auth_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
+        val strbody = Json.toJson(newFind).toString
+        if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
           val respuesta = pokemonService.getGyms(find)
 
