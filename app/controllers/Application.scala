@@ -1,15 +1,18 @@
 package controllers
 
 import dto._
+import org.joda.time.{DateTime, DateTimeZone}
 import play.api.mvc._
 import play.api.Play.current
-
 import play.api.db._
+import play.api.http.Status._
 import pokemon.PokemonServices
 import play.api.libs.json._
 
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits._
+import tools.PokeCipher
+
 import scala.concurrent.ExecutionContext.Implicits.global._
 
 trait Protocols {
@@ -46,22 +49,36 @@ object Application  extends Controller with Service {
   def getHeaders = Action.async(parse.json) { implicit request =>
 
     println("headers: " + request.headers)
-
     println("body: " + request.body.toString())
-
+    println("hora: " + DateTime.now(DateTimeZone.UTC).getHourOfDay)
 
     Future(Ok(Json.toJson( "" )))
 
   }
 
 
+  def checkBody(body : String, tokenValid : String): Boolean ={
+    val encBody = PokeCipher.encrypt(body)
+    tokenValid.equals(encBody)
+  }
+
   def getRefresh = Action.async(parse.json) { implicit request =>
+
+    println("headers: " + request.headers)
+    println("body: " + request.body.toString())
+    println("hora: " + DateTime.now(DateTimeZone.UTC).getHourOfDay)
 
     request.body.validate[Token].map{
       case find => {
-        val pokemonService = new PokemonServices
-        val ref = pokemonService.getRefresh(find.auth_code)
-        Future(Ok(Json.toJson( ref )))
+
+        val newFind = find.copy(aut_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
+        if(checkBody(newFind.toString, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+          val pokemonService = new PokemonServices
+          val ref = pokemonService.getRefresh(find.auth_code)
+          Future(Ok(Json.toJson(ref)))
+        }else{
+          Future(BadRequest("Check your request or your timezone."))
+        }
       }
     }.recoverTotal{
       e => Future(BadRequest("Detected error:"+ JsError.toFlatJson(e)))
@@ -70,11 +87,20 @@ object Application  extends Controller with Service {
 
   def findActivePokemon = Action.async(parse.json) { implicit request =>
 
+    println("headers: " + request.headers)
+    println("body: " + request.body.toString())
+    println("hora: " + DateTime.now(DateTimeZone.UTC).getHourOfDay)
+
     request.body.validate[FindPokemon].map{
       case find => {
-        val pokemonService = new PokemonServices
-        val respuesta = pokemonService.getCatchablePokemons(find)
-        Future(Ok(Json.toJson(respuesta )))
+        val newFind = find.copy(aut_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
+        if(checkBody(newFind.toString, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+          val pokemonService = new PokemonServices
+          val respuesta = pokemonService.getCatchablePokemons(find)
+          Future(Ok(Json.toJson(respuesta )))
+        }else{
+          Future(BadRequest("Check your request or your timezone."))
+        }
       }
     }.recoverTotal{
       e => Future(BadRequest("Detected error:"+ JsError.toFlatJson(e)))
@@ -85,9 +111,14 @@ object Application  extends Controller with Service {
 
     request.body.validate[FindPokemon].map{
       case find => {
-        val pokemonService = new PokemonServices
-        val respuesta = pokemonService.getPokeStop(find)
-        Future(Ok(Json.toJson(respuesta )))
+        val newFind = find.copy(aut_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
+        if(checkBody(newFind.toString, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+          val pokemonService = new PokemonServices
+          val respuesta = pokemonService.getPokeStop(find)
+          Future(Ok(Json.toJson(respuesta )))
+        }else{
+          Future(BadRequest("Check your request or your timezone."))
+        }
       }
     }.recoverTotal{
       e => Future(BadRequest("Detected error:"+ JsError.toFlatJson(e)))
@@ -98,10 +129,15 @@ object Application  extends Controller with Service {
 
     request.body.validate[FindPokemon].map{
       case find => {
-        val pokemonService = new PokemonServices
-        val respuesta = pokemonService.getGyms(find)
+        val newFind = find.copy(aut_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
+        if(checkBody(newFind.toString, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+          val pokemonService = new PokemonServices
+          val respuesta = pokemonService.getGyms(find)
 
-        Future(Ok(Json.toJson(respuesta )))
+          Future(Ok(Json.toJson(respuesta )))
+        }else{
+          Future(BadRequest("Check your request or your timezone."))
+        }
       }
     }.recoverTotal{
       e => Future(BadRequest("Detected error:"+ JsError.toFlatJson(e)))
