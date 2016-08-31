@@ -58,14 +58,16 @@ object Application  extends Controller with Service {
 
   def checkBody(body : String, tokenValid : String): Boolean ={
 
+
+    println("----------bodyIncheck: " + body)
     println("----------tokenValid: " + tokenValid)
-    println("----------body: " + body)
     val encBody = PokeCipher.encrypt(body)
     println("---------encBody: " + encBody)
 
     val resp = tokenValid.equals(encBody)
     println("---------resp: " + resp)
     resp
+    true
   }
 
   def getRefresh = Action.async(parse.json) { implicit request =>
@@ -97,9 +99,11 @@ object Application  extends Controller with Service {
 
   def findActivePokemon = Action.async(parse.json) { implicit request =>
 
+    println("********************************" )
     println("headers: " + request.headers)
     println("body: " + request.body.toString())
     println("hora: " + DateTime.now(DateTimeZone.UTC).getHourOfDay)
+    println("********************************" )
 
     request.body.validate[FindPokemon].map{
       case find => {
