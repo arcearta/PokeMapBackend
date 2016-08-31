@@ -77,16 +77,18 @@ object Application  extends Controller with Service {
     request.body.validate[Token].map{
       case find => {
 
-        val newFind = find.copy(auth_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
-        val strbody = Json.toJson(newFind).toString
-        if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+       // val newFind = find.copy(auth_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
+        // val strbody = Json.toJson(newFind).toString
+       // if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
           val ref = pokemonService.getRefresh(find.auth_code)
           println("refreshgen: " + ref)
+          Thread.sleep(10000)
           Future(Ok(Json.toJson(ref)))
-        }else{
-          Future(BadRequest("Invalid request, check parameters and time zone."))
-        }
+        // }else{
+        //  Thread.sleep(10000)
+        //  Future(BadRequest("Invalid request, check parameters and time zone."))
+        // }
       }
     }.recoverTotal{
       e => Future(BadRequest("Detected error:"+ JsError.toFlatJson(e)))
