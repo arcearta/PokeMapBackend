@@ -112,6 +112,7 @@ object Application  extends Controller with Service {
         if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
           val respuesta = pokemonService.getCatchablePokemons(find)
+          println(respuesta)
           Future(Ok(Json.toJson(respuesta )))
         }else{
           Future(BadRequest("Check your request or your timezone."))
