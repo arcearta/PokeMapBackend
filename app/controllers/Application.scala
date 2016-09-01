@@ -85,7 +85,7 @@ object Application  extends Controller with Service {
           val pokemonService = new PokemonServices
           val ref = pokemonService.getRefresh(find.auth_code)
           println("refreshgen: " + ref)
-          Thread.sleep(10000)
+          //Thread.sleep(10000)
           Future(Ok(Json.toJson(ref)))
         // }else{
         //  Thread.sleep(10000)
