@@ -145,7 +145,9 @@ class PokemonServices extends App{
 
       println("all pokemon in area:" + listPokemons.size)
       println(listPokemons)
-      listPokemons
+      val distipoke = listPokemons.distinct
+      println("all distinc pock in area:" + listPokemons.size)
+      distipoke
 
 
     }
