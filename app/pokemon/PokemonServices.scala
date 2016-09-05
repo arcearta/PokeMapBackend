@@ -9,6 +9,7 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
 import com.pokegoapi.util.Log
 import dto._
 import okhttp3.OkHttpClient
@@ -128,13 +129,23 @@ class PokemonServices extends App{
       })
       listPokemons
 
-     /* val nearbyPokemons: List[NearbyPokemon] = spawnPoints.getNearbyPokemons.toList
+
+      val wildPokemons: List[WildPokemon] = spawnPoints.getWildPokemons.toList
+      println("wildPokemons in area:" + wildPokemons.size)
+      wildPokemons.foreach(cp => {
+        listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonData.getPokemonId.getNumber, cp.getPokemonData.getPokemonId.name, 0, Some(Position(cp.getLatitude, cp.getLongitude))))
+      })
+
+      /*val nearbyPokemons: List[NearbyPokemon] = spawnPoints.getNearbyPokemons.toList
       println("nearbyPokemons in area:" + nearbyPokemons.size)
 
       nearbyPokemons.foreach(cp => {
         listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, 0, Some(Position(cp.getLatitude, cp.getLongitude))))
-      })
-      listPokemons*/
+      })*/
+
+      println("all pokemon in area:" + listPokemons.size)
+      println(listPokemons)
+      listPokemons
 
 
     }
