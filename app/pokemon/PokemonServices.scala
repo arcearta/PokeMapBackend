@@ -118,23 +118,34 @@ class PokemonServices extends App{
       Thread.sleep(4000)
 
       //6.254010, -75.578931
-      go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)
-      val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.width)
+      val boxes = getBoundingBox(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 150)
+      println("Posiciones: " + boxes)
 
-      val catchablePokemon: List[MapPokemon] = spawnPoints.getCatchablePokemons.toList
-      println("catchablePokemon in area:" + catchablePokemon.size)
+      boxes.foreach( position => {
+        go.setLocation(position.latitud, position.longitud, 0)
+        val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.width)
 
-      catchablePokemon.foreach(cp => {
-        listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, cp.getExpirationTimestampMs, Some(Position(cp.getLatitude, cp.getLongitude))))
+        val catchablePokemon: List[MapPokemon] = spawnPoints.getCatchablePokemons.toList
+        println("catchablePokemon in area:" + catchablePokemon.size)
+
+        catchablePokemon.foreach(cp => {
+          listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, cp.getExpirationTimestampMs, Some(Position(cp.getLatitude, cp.getLongitude))))
+        })
       })
-      listPokemons
+
+      println("Final all pokemon:" + listPokemons.size)
+      val result = listPokemons.distinct
+      println("Final all pokemon:" + result.size)
+      println(result)
 
 
+
+      /*
       val wildPokemons: List[WildPokemon] = spawnPoints.getWildPokemons.toList
       println("wildPokemons in area:" + wildPokemons.size)
       wildPokemons.foreach(cp => {
         listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonData.getPokemonId.getNumber, cp.getPokemonData.getPokemonId.name, 0, Some(Position(cp.getLatitude, cp.getLongitude))))
-      })
+      })*/
 
       /*val nearbyPokemons: List[NearbyPokemon] = spawnPoints.getNearbyPokemons.toList
       println("nearbyPokemons in area:" + nearbyPokemons.size)
@@ -143,12 +154,7 @@ class PokemonServices extends App{
         listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, 0, Some(Position(cp.getLatitude, cp.getLongitude))))
       })*/
 
-      println("all pokemon in area:" + listPokemons.size)
-      println(listPokemons)
-      val distipoke = listPokemons.distinct
-      println("all distinc pock in area:" + listPokemons.size)
-      distipoke
-
+      result
 
     }
     catch {
@@ -204,6 +210,7 @@ class PokemonServices extends App{
       val go: PokemonGo = new PokemonGo(datos._1, datos._2)
 
       Thread.sleep(4000)
+
 
       //6.254010, -75.578931
       go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)
@@ -278,6 +285,33 @@ class PokemonServices extends App{
       }
     }
   }
+
+  def getBoundingBox(pLatitude : Double, pLongitude: Double, pDistanceInMeters : Int) = {
+
+    val latRadian = Math.toRadians(pLatitude);
+
+    val degLatKm = 110.574235;
+    val degLongKm = 110.572833 * Math.cos(latRadian);
+    val deltaLat = pDistanceInMeters / 1000.0 / degLatKm;
+    val deltaLong = pDistanceInMeters / 1000.0 / degLongKm;
+
+    val minLat = pLatitude - deltaLat;
+    val minLong = pLongitude - deltaLong;
+    val maxLat = pLatitude + deltaLat;
+    val maxLong = pLongitude + deltaLong;
+
+    Position(pLatitude, pLongitude)
+
+    val listaPosicionesList = List(Position(pLatitude, pLongitude),
+                                   Position(minLat, minLong),
+                                   Position(minLat, maxLong),
+                                   Position(maxLat, maxLong),
+                                   Position(maxLat, minLong)
+                                   )
+
+    listaPosicionesList
+  }
+
 
 
 }
