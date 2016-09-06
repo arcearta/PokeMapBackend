@@ -118,7 +118,7 @@ class PokemonServices extends App{
       Thread.sleep(4000)
 
       //6.254010, -75.578931
-      val boxes = getBoundingBox(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 150)
+      val boxes = getBoundingBox(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 300)
       println("Posiciones: " + boxes)
 
       boxes.foreach( position => {
@@ -127,6 +127,7 @@ class PokemonServices extends App{
 
         val catchablePokemon: List[MapPokemon] = spawnPoints.getCatchablePokemons.toList
         println("catchablePokemon in area:" + catchablePokemon.size)
+        println(catchablePokemon)
 
         catchablePokemon.foreach(cp => {
           listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, cp.getExpirationTimestampMs, Some(Position(cp.getLatitude, cp.getLongitude))))
