@@ -123,6 +123,7 @@ class PokemonServices extends App{
 
       boxes.foreach( position => {
         go.getRequestHandler
+        println("position:" + position)
         go.setLocation(position.latitud, position.longitud, 0)
         val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.width)
 
