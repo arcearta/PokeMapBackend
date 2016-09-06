@@ -112,7 +112,7 @@ class PokemonServices extends App{
     var listPokemons = List[PokemonPosition]()
     try {
       val datos = authenticate(findPokemon.token, http)
-
+      Thread.sleep(2000)
       //6.254010, -75.578931
       val boxes = getBoundingBox(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 300)
       println("Posiciones: " + boxes)
