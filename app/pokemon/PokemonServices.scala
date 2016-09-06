@@ -113,11 +113,12 @@ class PokemonServices extends App{
     try {
 
       //6.254010, -75.578931
-      val boxes = getBoundingBox(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 600)
+      val boxes = getBoundingBox(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 300)
       println("Posiciones: " + boxes)
-      val datos = authenticate(findPokemon.token, http)
-      Thread.sleep(4000)
+
       boxes.foreach( position => {
+        val datos = authenticate(findPokemon.token, http)
+        Thread.sleep(2000)
         val go: PokemonGo = new PokemonGo(datos._1, datos._2)
 
 
