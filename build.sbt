@@ -26,6 +26,7 @@ libraryDependencies ++= Seq(
   //"com.github.Grover-c13" % "PokeGOAPI-Java" % "0.3" % "provided",
   "com.github.svarzee" % "gpsoauth-java" % "v0.3.0",
   "com.google.api-client" % "google-api-client" % "1.22.0",
+  "com.github.nkzawa" % "socket.io-client" % "0.3.0",
   "com.google.protobuf" % "protobuf-java" % "3.0.0",
   "com.squareup.okio" % "okio" % "1.9.0",
   "com.squareup.moshi" % "moshi" % "1.2.0",

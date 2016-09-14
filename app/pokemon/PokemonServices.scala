@@ -178,7 +178,7 @@ class PokemonServices extends App{
       val datos = authenticate(findPokemon.token, http)
       val go: PokemonGo = new PokemonGo(datos._1, datos._2)
 
-      Thread.sleep(4000)
+      Thread.sleep(3000)
 
       //6.254010, -75.578931
       go.setLocation(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 0)

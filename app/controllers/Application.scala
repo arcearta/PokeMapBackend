@@ -1,5 +1,6 @@
 package controllers
 
+import com.github.nkzawa.socketio.client.{IO, Socket}
 import dto._
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.mvc._
@@ -11,6 +12,8 @@ import play.api.libs.json._
 import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits._
 import tools.PokeCipher
+import com.github.nkzawa.socketio.client.IO
+import com.github.nkzawa.socketio.client.Socket
 
 import scala.concurrent.ExecutionContext.Implicits.global._
 
@@ -41,7 +44,7 @@ object Application  extends Controller with Service {
 
   def index = Action {
     //Ok(views.html.index(null))
-    Ok("exto")
+    Ok("index de aplicacion")
   }
 
 
@@ -57,7 +60,6 @@ object Application  extends Controller with Service {
 
 
   def checkBody(body : String, tokenValid : String): Boolean ={
-
 
     println("----------bodyIncheck: " + body)
     println("----------tokenValid: " + tokenValid)
@@ -79,18 +81,15 @@ object Application  extends Controller with Service {
     request.body.validate[Token].map{
       case find => {
 
-       // val newFind = find.copy(auth_date = DateTime.now(DateTimeZone.UTC).getHourOfDay)
-        // val strbody = Json.toJson(newFind).toString
-       // if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
+        Emiter.init()
+        Emiter.attemptSend()
+
           val pokemonService = new PokemonServices
           val ref = pokemonService.getRefresh(find.auth_code)
           println("refreshgen: " + ref)
           //Thread.sleep(10000)
           Future(Ok(Json.toJson(ref)))
-        // }else{
-        //  Thread.sleep(10000)
-        //  Future(BadRequest("Invalid request, check parameters and time zone."))
-        // }
+
       }
     }.recoverTotal{
       e => Future(BadRequest("Detected error:"+ JsError.toFlatJson(e)))
@@ -111,12 +110,33 @@ object Application  extends Controller with Service {
         val strbody = Json.toJson(newFind).toString
         if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
-          val respuesta = pokemonService.getAllNearPokemons(find)
+          val respuesta = pokemonService.getCatchablePokemons(find)
           println(respuesta)
           Future(Ok(Json.toJson(respuesta )))
         }else{
           Future(BadRequest("Check your request or your timezone."))
         }
+      }
+    }.recoverTotal{
+      e => Future(BadRequest("Detected error:"+ JsError.toFlatJson(e)))
+    }
+  }
+
+  def socketActivePokemon = Action.async(parse.json) { implicit request =>
+
+    println("********************************" )
+    println("headers: " + request.headers)
+    println("body: " + request.body.toString())
+    println("hora: " + DateTime.now(DateTimeZone.UTC).getHourOfDay)
+    println("********************************" )
+
+    request.body.validate[FindPokemon].map{
+      case find => {
+
+
+
+        Future(Ok(Json.toJson("respuesta" )))
+
       }
     }.recoverTotal{
       e => Future(BadRequest("Detected error:"+ JsError.toFlatJson(e)))
@@ -182,4 +202,5 @@ object Application  extends Controller with Service {
     }
     Ok(out)
   }
+
 }
