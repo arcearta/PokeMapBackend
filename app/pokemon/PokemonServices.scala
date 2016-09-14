@@ -9,14 +9,17 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.pokegoapi.api.PokemonGo
 import com.pokegoapi.api.map.MapObjects
-import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon;
+import POGOProtos.Map.Pokemon.NearbyPokemonOuterClass.NearbyPokemon
 import com.pokegoapi.util.Log
 import dto._
 import okhttp3.OkHttpClient
 import com.pokegoapi.auth._
+import controllers.Emmiter
 import tools.Crypter
 
 import scala.collection.JavaConversions._
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by arcearta on 2016/07/26.
@@ -107,41 +110,54 @@ class PokemonServices extends App{
     encryptedValue
   }
 
-  def getAllNearPokemons(findPokemon: FindPokemon): List[PokemonPosition] = {
+  def getCacheable(position: Position, findPokemon: FindPokemon): List[PokemonPosition] = {
     val http: OkHttpClient = new OkHttpClient
     var listPokemons = List[PokemonPosition]()
+
+    val datos = authenticate(findPokemon.token, http)
+    Thread.sleep(2000)
+    val go: PokemonGo = new PokemonGo(datos._1, datos._2)
+
+
+    go.getRequestHandler
+    //println("position:" + position)
+    go.setLocation(position.latitud, position.longitud, 0)
+    val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.width)
+
+    val catchablePokemon: List[MapPokemon] = spawnPoints.getCatchablePokemons.toList
+    println("catchablePokemon in area:" + catchablePokemon.size)
+    println(catchablePokemon)
+
+    catchablePokemon.foreach(cp => {
+      val timeTohide = if(cp.getExpirationTimestampMs > 0) cp.getExpirationTimestampMs else 2000
+      listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, timeTohide, Some(Position(cp.getLatitude, cp.getLongitude))))
+    })
+    listPokemons
+  }
+
+  def getAllNearPokemons(findPokemon: FindPokemon): List[PokemonPosition] = {
+
+    var listPokemons = List[PokemonPosition]()
+
     try {
 
       //6.254010, -75.578931
       val boxes = getBoundingBox(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 300)
-      println("Posiciones: " + boxes)
+      //println("Posiciones: " + boxes)
 
-      boxes.foreach( position => {
-        val datos = authenticate(findPokemon.token, http)
-        Thread.sleep(2000)
-        val go: PokemonGo = new PokemonGo(datos._1, datos._2)
+      listPokemons = getCacheable(findPokemon.position.get, findPokemon)
 
 
-        go.getRequestHandler
-        println("position:" + position)
-        go.setLocation(position.latitud, position.longitud, 0)
-        val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.width)
-
-        val catchablePokemon: List[MapPokemon] = spawnPoints.getCatchablePokemons.toList
-        println("catchablePokemon in area:" + catchablePokemon.size)
-        println(catchablePokemon)
-
-        catchablePokemon.foreach(cp => {
-          listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, cp.getExpirationTimestampMs, Some(Position(cp.getLatitude, cp.getLongitude))))
+      Future {
+        boxes.foreach( position => {
+          Thread.sleep(10000)
+          val otros = getCacheable(position, findPokemon)
+          println("Pokemons en emitter: " + otros)
+          Emmiter.sendMessage("57", otros)
         })
-      })
+      }
 
-      println("Final all pokemon:" + listPokemons.size)
-      val result = listPokemons.distinct
-      println("Final all pokemon:" + result.size)
-      println(result)
-
-
+      println("Pokemons iniciales: " + listPokemons)
 
       /*
       val wildPokemons: List[WildPokemon] = spawnPoints.getWildPokemons.toList
@@ -157,7 +173,7 @@ class PokemonServices extends App{
         listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, 0, Some(Position(cp.getLatitude, cp.getLongitude))))
       })*/
 
-      result
+      listPokemons
 
     }
     catch {
@@ -303,9 +319,9 @@ class PokemonServices extends App{
     val maxLat = pLatitude + deltaLat;
     val maxLong = pLongitude + deltaLong;
 
-    Position(pLatitude, pLongitude)
+    //val initial = Position(pLatitude, pLongitude)
 
-    val listaPosicionesList = List(Position(pLatitude, pLongitude),
+    val listaPosicionesList = List(
                                    Position(minLat, minLong),
                                    Position(minLat, maxLong),
                                    Position(maxLat, maxLong),
