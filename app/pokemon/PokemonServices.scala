@@ -130,7 +130,7 @@ class PokemonServices extends App{
     println(catchablePokemon)
 
     catchablePokemon.foreach(cp => {
-      val timeTohide = if(cp.getExpirationTimestampMs > 0) cp.getExpirationTimestampMs else Calendar.getInstance().getTime().getTime + 2000
+      val timeTohide = if(cp.getExpirationTimestampMs > 0) cp.getExpirationTimestampMs else Calendar.getInstance().getTime().getTime + 120000
       listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, timeTohide, Some(Position(cp.getLatitude, cp.getLongitude))))
     })
     listPokemons
@@ -206,7 +206,7 @@ class PokemonServices extends App{
       println("Pokemon in area:" + catchablePokemon.size)
 
       catchablePokemon.foreach(cp => {
-        val timeTohide = if(cp.getExpirationTimestampMs > 0) cp.getExpirationTimestampMs else Calendar.getInstance().getTime().getTime + 2000
+        val timeTohide = if(cp.getExpirationTimestampMs > 0) cp.getExpirationTimestampMs else Calendar.getInstance().getTime().getTime + 120000
         listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, timeTohide, Some(Position(cp.getLatitude, cp.getLongitude))))
       })
       listPokemons
