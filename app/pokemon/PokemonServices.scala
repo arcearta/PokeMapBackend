@@ -205,7 +205,8 @@ class PokemonServices extends App{
       println("Pokemon in area:" + catchablePokemon.size)
 
       catchablePokemon.foreach(cp => {
-        listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, cp.getExpirationTimestampMs, Some(Position(cp.getLatitude, cp.getLongitude))))
+        val timeTohide = if(cp.getExpirationTimestampMs > 0) cp.getExpirationTimestampMs else 2000
+        listPokemons = listPokemons ++ List(PokemonPosition(cp.getPokemonId.getNumber, cp.getPokemonId.name, timeTohide, Some(Position(cp.getLatitude, cp.getLongitude))))
       })
       listPokemons
     }

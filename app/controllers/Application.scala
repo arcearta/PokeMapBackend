@@ -106,7 +106,7 @@ object Application  extends Controller with Service {
         val strbody = Json.toJson(newFind).toString
         if(checkBody(strbody, request.headers.get("AUTH-TOKEN").getOrElse(""))) {
           val pokemonService = new PokemonServices
-          val respuesta = pokemonService.getAllNearPokemons(find)
+          val respuesta = pokemonService.getCatchablePokemons(find)
           println(respuesta)
           Future(Ok(Json.toJson(respuesta )))
         }else{
