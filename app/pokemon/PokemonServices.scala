@@ -321,13 +321,13 @@ class PokemonServices extends App{
     val maxLat = pLatitude + deltaLat;
     val maxLong = pLongitude + deltaLong;
 
-    //val initial = Position(pLatitude, pLongitude)
+    val initial = Position(pLatitude, pLongitude)
 
-    val listaPosicionesList = List(
-                                   Position(minLat, minLong),
-                                   Position(minLat, maxLong),
-                                   Position(maxLat, maxLong),
-                                   Position(maxLat, minLong)
+    val listaPosicionesList = List(initial
+                                   //Position(minLat, minLong),
+      //Position(minLat, maxLong),
+      //Position(maxLat, maxLong),
+      // Position(maxLat, minLong)
                                    )
 
     listaPosicionesList
