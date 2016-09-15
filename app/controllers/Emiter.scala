@@ -5,13 +5,26 @@ import com.corundumstudio.socketio.Configuration
 import com.corundumstudio.socketio.SocketIOClient
 import com.corundumstudio.socketio.SocketIOServer
 import com.corundumstudio.socketio.listener.DataListener
-import dto.PokemonPosition
+import dto.{Stop, _}
 import play.api.libs.json.Json
 
 /**
   * Created by arcearta on 2016/09/11.
   */
 object Emmiter {
+
+  implicit val tokenFormat = Json.writes[Token]
+  implicit val tokenReadFormat = Json.reads[Token]
+  implicit val pokemonPositionFormat = Json.writes[Position]
+  implicit val pokemonPositionReadFormat = Json.reads[Position]
+
+  implicit val pokemonInfoFormat = Json.writes[PokemonPosition]
+
+  implicit val findPokemonFormat = Json.writes[FindPokemon]
+  implicit val findPokemonReadFormat = Json.reads[FindPokemon]
+
+  implicit val findGymFormat = Json.writes[Gym]
+  implicit val findStopFormat = Json.writes[Stop]
 
   var config:Configuration  = new Configuration()
   config.setHostname("50.116.54.176")
