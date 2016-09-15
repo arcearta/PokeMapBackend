@@ -13,8 +13,8 @@ import dto.PokemonPosition
 object Emmiter {
 
   var config:Configuration  = new Configuration()
-  //config.setHostname("50.116.54.176")
-  config.setHostname("localhost")
+  config.setHostname("50.116.54.176")
+  //config.setHostname("localhost")
   config.setPort(9092)
 
   val server:SocketIOServer  = new SocketIOServer(config)
