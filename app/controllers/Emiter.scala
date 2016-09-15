@@ -6,6 +6,7 @@ import com.corundumstudio.socketio.SocketIOClient
 import com.corundumstudio.socketio.SocketIOServer
 import com.corundumstudio.socketio.listener.DataListener
 import dto.PokemonPosition
+import play.api.libs.json.Json
 
 /**
   * Created by arcearta on 2016/09/11.
@@ -36,7 +37,9 @@ object Emmiter {
   }
 
   def sendMessage(postalCode:String, listPokemon: List[PokemonPosition]): Unit ={
-    server.getBroadcastOperations().sendEvent(postalCode, listPokemon)
+      val datos = Json.toJson(listPokemon)
+      println("Pokemons en emitter: " + datos)
+      server.getBroadcastOperations().sendEvent(postalCode, datos )
 
     /*
     server.addEventListener("chatevent", ChatObject.class, new DataListener<ChatObject>() {

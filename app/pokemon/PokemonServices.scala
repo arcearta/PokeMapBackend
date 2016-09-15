@@ -153,7 +153,7 @@ class PokemonServices extends App{
         boxes.foreach( position => {
           Thread.sleep(10000)
           val otros = getCacheable(position, findPokemon)
-          println("Pokemons en emitter: " + otros)
+
           Emmiter.sendMessage("57", otros)
         })
       }
