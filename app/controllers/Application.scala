@@ -51,8 +51,6 @@ object Application  extends Controller with Service {
     //println("body: " + request.body.toString())
     //println("hora: " + DateTime.now(DateTimeZone.UTC).getHourOfDay)
 
-    Emmiter.sendMessageString("57", "mensaje enviato del emmiter")
-
     Future(Ok(Json.toJson( "" )))
 
   }

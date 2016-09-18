@@ -15,17 +15,36 @@ import com.pokegoapi.util.Log
 import dto._
 import okhttp3.OkHttpClient
 import com.pokegoapi.auth._
-import controllers.Emmiter
+import play.api.libs.json.Json
+import rest.CallRestService
 import tools.Crypter
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
+
+case class Message(eventName : String, message : List[PokemonPosition] )
 /**
   * Created by arcearta on 2016/07/26.
   */
 class PokemonServices extends App{
+
+  implicit val tokenFormat = Json.writes[Token]
+  implicit val tokenReadFormat = Json.reads[Token]
+  implicit val pokemonPositionFormat = Json.writes[Position]
+  implicit val pokemonPositionReadFormat = Json.reads[Position]
+
+  implicit val pokemonInfoFormat = Json.writes[PokemonPosition]
+  implicit val messageFormat = Json.writes[Message]
+
+  implicit val findPokemonFormat = Json.writes[FindPokemon]
+  implicit val findPokemonReadFormat = Json.reads[FindPokemon]
+
+  implicit val findGymFormat = Json.writes[Gym]
+  implicit val findStopFormat = Json.writes[Stop]
+
+  val urToEmit = "http://50.116.54.176:3000/emitMessage";
 
   override def main(args: Array[String]) {
     println("Hello, world")
@@ -119,9 +138,7 @@ class PokemonServices extends App{
     Thread.sleep(2000)
     val go: PokemonGo = new PokemonGo(datos._1, datos._2)
 
-
     go.getRequestHandler
-    //println("position:" + position)
     go.setLocation(position.latitud, position.longitud, 0)
     val spawnPoints: MapObjects = go.getMap.getMapObjects(findPokemon.width)
 
@@ -142,19 +159,17 @@ class PokemonServices extends App{
 
     try {
 
-      //6.254010, -75.578931
       val boxes = getBoundingBox(findPokemon.position.get.latitud, findPokemon.position.get.longitud, 300)
-      //println("Posiciones: " + boxes)
-
       listPokemons = getCacheable(findPokemon.position.get, findPokemon)
-
 
       Future {
         boxes.foreach( position => {
           Thread.sleep(10000)
           val otros = getCacheable(position, findPokemon)
 
-          Emmiter.sendMessage("57", otros)
+          val mensaje = Message("57", otros)
+
+          CallRestService.sendMessage(urToEmit ,  Json.toJson(mensaje).toString())
         })
       }
 
