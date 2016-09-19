@@ -11,7 +11,7 @@ object Main {
     def * = (id, username)
   }
 
-  def main(args: Array[String]): Unit = {
+  /*def main(args: Array[String]): Unit = {
 
     // my database server is located on the localhost
     // database name is "my-db"
@@ -34,5 +34,5 @@ object Main {
         }
 
     }
-  }
+  }*/
 }

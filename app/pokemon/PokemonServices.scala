@@ -46,10 +46,6 @@ class PokemonServices extends App{
 
   val urToEmit = "http://50.116.54.176:3000/emitMessage";
 
-  override def main(args: Array[String]) {
-    println("Hello, world")
-  }
-
   def convertStreamToString(is : InputStream) : String = {
     def inner(reader : BufferedReader, sb : StringBuilder) : String = {
       val line = reader.readLine()
