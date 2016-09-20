@@ -26,6 +26,8 @@ object CallRestService {
 
   def sendMessage(serviceUrl: String, params: String): Future[String] =
     try {
+      println("Send message to " + serviceUrl)
+      println("params: " + params)
       val request =
         url(serviceUrl)
           .POST
@@ -34,6 +36,7 @@ object CallRestService {
 
       Http(request.>(f => {
         if (f.getStatusCode == 200) {
+          println("response: " + f.getStatusCode)
           //val entryDate = f.getResponseBody.parseJson.convertTo[LastEntryDate]
           //entryDate.date
           ""
