@@ -160,7 +160,7 @@ class PokemonServices extends App{
 
       Future {
         boxes.foreach( position => {
-          Thread.sleep(10000)
+          Thread.sleep(6000)
           val otros = getCacheable(position, findPokemon)
 
           val mensaje = Message("57", otros)
@@ -334,11 +334,11 @@ class PokemonServices extends App{
 
     val initial = Position(pLatitude, pLongitude)
 
-    val listaPosicionesList = List(initial
-                                   //Position(minLat, minLong),
-      //Position(minLat, maxLong),
-      //Position(maxLat, maxLong),
-      // Position(maxLat, minLong)
+    val listaPosicionesList = List(
+       Position(minLat, minLong),
+      Position(minLat, maxLong),
+      Position(maxLat, maxLong),
+       Position(maxLat, minLong)
                                    )
 
     listaPosicionesList
