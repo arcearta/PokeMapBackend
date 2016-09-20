@@ -164,10 +164,11 @@ class PokemonServices extends App{
           Thread.sleep(6000)
           println("########buscando nuevos pokemon: " )
           val otros = getCacheable(position, findPokemon)
-
+          println("########encontrados: " + otros.size)
           val mensaje = Message("57", otros)
 
           CallRestService.sendMessage(urToEmit ,  Json.toJson(mensaje).toString())
+          println("########mensaje enviado: " + mensaje)
         })
       }
 
